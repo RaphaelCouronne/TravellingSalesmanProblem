@@ -28,7 +28,7 @@ plt.show()
 
 #%%
 
-from lara_code import test_gen
+from old.lara_code import test_gen
 
 n_iterations = 200
 n_samples = 250
@@ -41,7 +41,6 @@ print([test1[idx] for idx in meilleur_individu])
 plot_chemin(chemin_genetic)
 
 #%%
-from lara_code import tsp1
 
 #chemin_g10a, distance_g10a = tsp1(test1)
 #print(distance_g10a)
