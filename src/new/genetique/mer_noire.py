@@ -12,11 +12,15 @@ villes_mer_noire = ["prague", "varna", "burgas", "constanza", "izmail", "reni", 
 tableau_mer_noire = [Prague, Varna, Burgas, Constanza, Izmail, Reni, Galati, Braila]
 
 matrice_mer_noire = {}
+nb_interdits = 0
 for i, v1 in enumerate(villes_mer_noire):
     for j, v2 in enumerate(villes_mer_noire):
         if i != j:
             d = tableau_mer_noire[i][j]
             if d > 0:
+                if d >= 1e+20:
+                    nb_interdits += 1
+                    print("{0}> -- trajet impossible de {1} a {2}".format(nb_interdits, v1, v2))
                 #print('stop at {0}, {1}'.format(i, j))
                 matrice_mer_noire[v1, v2] = tableau_mer_noire[i][j]
 

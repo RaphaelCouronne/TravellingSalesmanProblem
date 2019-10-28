@@ -6,19 +6,19 @@ from random import randint
 
 ### Génération d'une population aléatoire ###
 
-def Individu_Alea(Liste_Sommets):
+def individu_alea(Liste_Sommets):
     return chemin_aleatoire(Liste_Sommets)
 
 
 def Generation_Pop_Alea(Liste_Sommets, pop_size, distfn=None):
     """ génère p individus aléatoirement """
-    return [Individu_Alea(Liste_Sommets) for _ in range(pop_size)]
+    return [individu_alea(Liste_Sommets) for _ in range(pop_size)]
 
 
 def Individu_Plus_Courts_Trajets(Liste_Sommets, i, distfn):
     """ détermine à partir du sommet i un cycle hamiltonien
-    en cherchant les sommets plus proches
-     """
+        en cherchant les sommets plus proches
+    """
     Sommets = Liste_Sommets.copy()
     initiale = Sommets[i]
     Liste_Temp = [initiale]
@@ -33,10 +33,14 @@ def Individu_Plus_Courts_Trajets(Liste_Sommets, i, distfn):
         Liste_Temp.append(Ville_Mini)
         Sommets.remove(Ville_Mini)
     # il faut maintenant effectuer le cycle sur Liste_Temp pour commencer à Sommets[0]
+    depart = Liste_Sommets[0]
+    trouve = -1
     for k in range(len(Liste_Temp)):
-        if Liste_Temp[k] == Liste_Sommets[0]:
+        if Liste_Temp[k] == depart:
+            trouve = k
             break
-    return Liste_Temp[k:] + Liste_Temp[:k]
+    assert trouve >= 0
+    return Liste_Temp[trouve:] + Liste_Temp[:trouve]
 
 
 def Generation_Pop_Semi_Alea(Liste_Sommets, p, distfn):
@@ -57,12 +61,17 @@ def Generation_Pop_Semi_Alea(Liste_Sommets, p, distfn):
 #
 # ---
 
-def adaptation_individu(Individu, distfn):
-    """ calcule la fonction d'adaptation correspondant  à un individu <-> cycle hamiltonien """
-    n = len(Individu)
-    Adapt = sum(distfn(Individu[k], Individu[k + 1]) for k in range(n - 1))
-    Adapt += distfn(Individu[-1], Individu[0])  # pour boucler le cycle
-    return Adapt
+def adaptation_individu(individu, distfn):
+    """ calcule la fonction d'adaptation correspondant  à un individu <-> cycle hamiltonien
+
+    Utilise la fonction de distance
+
+    retourne un nombre flottant
+     """
+    n = len(individu)
+    adapt = sum(distfn(individu[k], individu[k + 1]) for k in range(n - 1))
+    adapt += distfn(individu[-1], individu[0])  # pour boucler le cycle
+    return adapt
 
 
 # ---
@@ -109,23 +118,18 @@ def Hybridation(Individu1, Individu2, i):
     assert len(mix2) == n
     return [mix1, mix2]
 
-    # return [Liste1[:i] + [x for x in Liste2 if Liste1[:i].count(x) == 0],
-    #         Liste2[:i] + [x for x in Liste1 if Liste2[:i].count(x) == 0]]
-
 
 def Hybridation_Alea(Individu1, Individu2):
     """
-    Variante aleatoire del hybridation, on tire au sort l allele.
+    Variante aleatoire de l'hybridation, on tire au sort l allele.
     :param Individu1:
     :param Individu2:
+
     :return:
     """
     n = len(Individu1)
     i = randint(2, n - 2)  # i=1 ou i=n n'engendre pas d'hybridation effective
     return Hybridation(Individu1, Individu2, i)
-
-
-# print(Hybridation_Alea(Individu1,Individu2)) # test OK
 
 
 def Mutation(Individu, k, l):
@@ -145,26 +149,6 @@ def Mutation(Individu, k, l):
                                                                                         Individu[k]] + Individu[l + 1:]
 
 
-def Echange2(Individu, k, l):
-    """
-    mute l'individu en modifiant les indices k,k+1,...,l-1,l
-    en l,l-1,...,k+1,k en partant de 1 <= k < l< n
-    """
-    assert k <= l - 1
-    assert l < len(Individu)
-    IndividuEchange = Individu.copy()
-    IndividuEchange[k] = Individu[l]
-    IndividuEchange[l] = Individu[k]
-    return IndividuEchange
-
-
-def Echange2_Alea(Individu):
-    n = len(Individu)
-    k = randint(1, n - 2)
-    l = randint(k + 1, n - 1)
-    return Echange2(Individu, k, l)
-
-
 def Mutation_Alea(Individu):
     """ modélise une mutation aléatoire
 
@@ -178,22 +162,49 @@ def Mutation_Alea(Individu):
     return Mutation(Individu, k, l)
 
 
+def Echange2(Individu, k, l):
+    """ mute l'individu en moechangeant les alleles k et l (k < l)
+
+    Note: retourne une copie modifiee de individu.
+    """
+    assert k <= l - 1
+    assert l < len(Individu)
+    IndividuEchange = Individu.copy()
+    IndividuEchange[k] = Individu[l]
+    IndividuEchange[l] = Individu[k]
+    return IndividuEchange
+
+
+def echange2_alea(Individu):
+    """ Effectue l echange de deux alleles tirees au sort K < l
+
+    :param Individu:
+    :return:
+    """
+    n = len(Individu)
+    k = randint(1, n - 2)
+    l = randint(k + 1, n - 1)
+    return Echange2(Individu, k, l)
+
+
 ### Sélection des individus ###
 
 
-def Selection_Tournoi(Individu1, Individu2, distfn):
-    # PCO: pourquoi copier??????
-    # pourquoi creer le listes???
+def Selection_Tournoi(Individu1, Individu2, distfn, win_proba=0.85):
+    """ renvoie le vainqueur entre deux individus,
+       en attribuant 85% de chance de viectoire pour le mieux adapté
 
-    """ renvoie le vainqueur entre deux individus, en attribuant 85% de chance de viectoire pour le mieux adapté """
+    TODO: pourquoi copier ici??
+       """
     if adaptation_individu(Individu1, distfn) < adaptation_individu(Individu2, distfn):  # individu 1 mieux adapté que 2
         Match = [Individu1.copy(), Individu2.copy()]
     else:
         Match = [Individu2.copy(), Individu1.copy()]
-    # Match[0] mieux adapté que Match[1]    x = random.uni  # modélise la loi uniforme sur [0,1]
-    if win_or_lose(win_proba=0.85):  # le mieux adapté gagne !!
+
+    if win_or_lose(win_proba=win_proba):
         return Match[0]
-    else:  # le moins adapté gagne !!!
+    else:
+        # danavec une probabilite 1 - win_proba (15%) le moins adapte gagne!
         return Match[1]
 
 
@@ -208,36 +219,20 @@ def Deux_Adversaires_Alea(Population):
     # ## en théorie randint(0,q-1) et randint(0,q-2)...
     # Liste_Indices.remove(k)  # pour ne pas choisir le même candidat
     # m = Liste_Indices[l]  # numéro du second candidat
-    return (Population[k], Population[l])
+    return Population[k], Population[l]
 
-
-# Population = [0,1,2,3,4,5]
-# for k in range(10) :
-#    print(Deux_Adversaires_Alea(Population))  # tests OK
 
 ### Choix de la meilleur moitié d'une population et choix du meilleur 
 
-def Meilleur_Moitie(Population, distfn):
-    """ ne retien que la moitié la plus adaptée à l'environnement """
-    q = len(Population)
+def meilleure_moitie(Population, distfn):
+    """ Retourne la moitie la mieux adaptee d une population.
+    """
     pop_triee = Population.copy()
-    # on trie la population par adaptation croissante
+    # on trie la population par adaptation croissante, avec list.sort()
     pop_triee.sort(key=lambda x: adaptation_individu(x, distfn))
     # on garde les q//2 meilleurs
+    q = len(Population)
     return pop_triee[:q // 2]
-    # Liste_Adaptation = [Adaptation_Individu(x) for x in Population]
-    # Liste_Adaptation.sort()  # on classe dans l'ordre croissant
-    # Mediane = Liste_Adaptation[q // 2]
-    # Liste_Meilleurs = []
-    # for x in Population:
-    #     if Adaptation_Individu(x) < Mediane:
-    #         Liste_Meilleurs.append(x)  # les meilleurs stricts sont placés à droite
-    #     if Adaptation_Individu(x) == Mediane:
-    #         Liste_Meilleurs = [x] + Liste_Meilleurs  # les ex-aequo de la médiane sont placés à gauche
-    # # on a peut-être compabilisé trop d'ex-aequo
-    # while len(Liste_Meilleurs) != q // 2:
-    #     Liste_Meilleurs.remove(Liste_Meilleurs[0])  # on élimine un individu de la médiane
-    # return Liste_Meilleurs
 
 
 def Meilleur_Individu(Population, distfn):
@@ -265,13 +260,15 @@ def calcule_generation_suivante(Population, distfn):
     nombre_echanges = 0
     nombre_hybdridations = 0
 
-    proba_hybridation = 0.20
+    proba_gagnant = 0.85  # la probabilite de choisir le gagnat dans les tournois
+    proba_hybridation = 0.20  # la probabilite de faire une hybdridation
     proba_mutation = 0.05
     proba_echange = 0.02
 
+    # extraction population temporaire: attention il peut y avoir des doublons...
     for k in range(q):
         Advers = Deux_Adversaires_Alea(Population)
-        Population_Temp.append(Selection_Tournoi(Advers[0], Advers[1], distfn))
+        Population_Temp.append(Selection_Tournoi(Advers[0], Advers[1], distfn, win_proba=proba_gagnant))
     # Population_Temp = population des gagnants des matchs
 
     ## modélisation des hybridations sur cette Population_Temp
@@ -299,10 +296,12 @@ def calcule_generation_suivante(Population, distfn):
         if win_or_lose(win_proba=proba_echange):
             nombre_echanges += 1
             print('-- echange #{}'.format(nombre_mutations))
-            Population_Temp[i] = Echange2_Alea(Individu_at_i)
+            Population_Temp[i] = echange2_alea(Individu_at_i)
 
-    ## choix des meilleurs individus de Population (génération g) (on en prend p//2) et des meilleurs individus de Population_Temp (génération g+1)(on en prend p//2)
-    return Meilleur_Moitie(Population, distfn) + Meilleur_Moitie(Population_Temp, distfn)
+    ## choix des meilleurs individus de Population (génération g)
+    # (on en prend p//2)
+    # et des meilleurs individus de Population_Temp (génération g+1)(on en prend p//2)
+    return meilleure_moitie(Population, distfn) + meilleure_moitie(Population_Temp, distfn)
 
 
 # noinspection PyUnusedLocal
@@ -315,10 +314,10 @@ def print_score(k, pop, chemin, adaptation):
 
 
 def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30, distfn=euclide, gen_animation_fn=print_score):
-    """ Lance l algorithme sur nb_gens generations
+    """ Lance l'algorithme sur nb_gens generations
 
     :param Liste_Sommets: une liste de villes (City)
-    :param nb_gens: un nombre >= 2
+    :param nb_gens: nombre de generations >= 2
     :param taille_pop: la taille des populations (defaut 30)
     :param distfn: la fonction de distance
     :param gen_animation_fn:une fonction appelee a chaque generation avec la
