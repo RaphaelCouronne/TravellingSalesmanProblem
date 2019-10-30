@@ -29,5 +29,5 @@ for i, v1 in enumerate(villes_mer_noire):
 from genetique.alg_gen2 import Dynamique_Population
 from common.distances import *
 
-c = Dynamique_Population(villes_mer_noire, 30, 20, distfn=matrice_vers_fonction(matrice_mer_noire), )
+c = Dynamique_Population(villes_mer_noire, 30, 20, distfn=matrice_vers_fonction(matrice_mer_noire), nb_bloque_max=10 )
 print(c)

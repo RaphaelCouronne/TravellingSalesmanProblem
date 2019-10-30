@@ -23,7 +23,7 @@ g35 = [
 
 l35 = genere_liste_sommets(g35)
 
-chemin= Dynamique_Population(l35, nb_gens=100, taille_pop=20, gen_animation_fn=print_score)
+chemin= Dynamique_Population(l35, nb_gens=100, taille_pop=40, gen_animation_fn=print_score)
 
 from visu.plot import *
 

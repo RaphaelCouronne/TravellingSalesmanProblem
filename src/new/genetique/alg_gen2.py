@@ -136,17 +136,21 @@ def Mutation(Individu, k, l):
     """
     mute l'individu en modifiant les indices k,k+1,...,l-1,l
     en l,l-1,...,k+1,k en partant de 1 <= k < l< n
+
+    Retourne: un chemin resultant de la mutation.
+
     """
     assert k <= l - 1
     assert l < len(Individu)
 
     if l - 1 == k:
+        # inchange jusqu a (k-1) puis (k+1,k) puis inchange de k+2 a N
         return Individu[:k] + [Individu[k + 1], Individu[k]] + Individu[k + 2:]
     elif l - 2 == k:
         return Individu[:k] + [Individu[k + 2], Individu[k + 1], Individu[k]] + Individu[k + 3:]
     else:
-        return Individu[:k] + [Individu[l], Individu[l - 1]] + Individu[k + 2:l - 1] + [Individu[k + 1],
-                                                                                        Individu[k]] + Individu[l + 1:]
+        return Individu[:k] + [Individu[l], Individu[l - 1]] + Individu[k + 2:l - 1] + \
+               [Individu[k + 1], Individu[k]] + Individu[l + 1:]
 
 
 def Mutation_Alea(Individu):
@@ -258,14 +262,15 @@ def calcule_generation_suivante(Population, distfn):
     # stats
     nombre_mutations = 0
     nombre_echanges = 0
-    nombre_hybdridations = 0
+    nombre_hybridations = 0
 
     proba_gagnant = 0.85  # la probabilite de choisir le gagnat dans les tournois
     proba_hybridation = 0.20  # la probabilite de faire une hybdridation
-    proba_mutation = 0.05
-    proba_echange = 0.02
+    proba_mutation = 0.10
+    proba_echange = 0.03
 
     # extraction population temporaire: attention il peut y avoir des doublons...
+    # population temp= les gagnants
     for k in range(q):
         Advers = Deux_Adversaires_Alea(Population)
         Population_Temp.append(Selection_Tournoi(Advers[0], Advers[1], distfn, win_proba=proba_gagnant))
@@ -274,11 +279,12 @@ def calcule_generation_suivante(Population, distfn):
     ## modélisation des hybridations sur cette Population_Temp
     # proba qu'une hypridation ait lieu entre deux chromosomes: 1/5
 
+
     for k in range(q - 1):
         for l in range(q - 1 - k):
             if win_or_lose(proba_hybridation):
-                print('-- hybridation k={0}, l={1}'.format(k, l))
-                nombre_hybdridations += 1
+                #print('-- hybridation k={0}, l={1}'.format(k, k+l+1))
+                nombre_hybridations += 1
                 Individus_Hybr = Hybridation_Alea(Population_Temp[k], Population_Temp[k + l + 1])
                 Population_Temp[k], Population_Temp[k + l + 1] = Individus_Hybr[0], Individus_Hybr[1]
 
@@ -287,16 +293,19 @@ def calcule_generation_suivante(Population, distfn):
         Individu_at_i = Population_Temp[i]
         if win_or_lose(proba_mutation):  # une mutation a lieu !!
             nombre_mutations += 1
-            print('-- mutation #{}'.format(nombre_mutations))
+            #print('-- mutation #{}'.format(nombre_mutations))
             # il FAUT modifier le tableau
-            Population_Temp[i] = Mutation_Alea(Individu_at_i)
+            resultat_mutation = Mutation_Alea(Individu_at_i)
+            Population_Temp[i] = resultat_mutation
 
     for i in range(len(Population_Temp)):
         Individu_at_i = Population_Temp[i]
         if win_or_lose(win_proba=proba_echange):
             nombre_echanges += 1
-            print('-- echange #{}'.format(nombre_mutations))
+            #print('-- echange #{}'.format(nombre_mutations))
             Population_Temp[i] = echange2_alea(Individu_at_i)
+
+    print("-- #hybridations={0}, mutations={1}, #echanges={2}".format(nombre_hybridations, nombre_mutations, nombre_echanges))
 
     ## choix des meilleurs individus de Population (génération g)
     # (on en prend p//2)
@@ -313,7 +322,10 @@ def print_score(k, pop, chemin, adaptation):
     print("- population #{0} adaptation: {1}".format(k, adaptation))
 
 
-def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30, distfn=euclide, gen_animation_fn=print_score):
+def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
+                         distfn=euclide,
+                         nb_bloque_max=30,
+                         gen_animation_fn=print_score):
     """ Lance l'algorithme sur nb_gens generations
 
     :param Liste_Sommets: une liste de villes (City)
@@ -327,7 +339,7 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30, distfn=euclide, 
     """
     ## Choixi du type de population initiale
     # Population = Generation_Pop_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ totalement aléatoire
-    Population = Generation_Pop_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ semi-aléatoire
+    Population = Generation_Pop_Semi_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ semi-aléatoire
     ##
 
     chemin, adaptation = Meilleur_Individu(Population, distfn)
@@ -343,7 +355,7 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30, distfn=euclide, 
         if adaptation >= prec_adaptation - 1e-6:
             print("*** stationnaire a l iteration {0}, nb bloques = {1}".format(k, bloque))
             bloque += 1
-            if bloque >= 25:
+            if bloque >= nb_bloque_max:
                 break
         else:
             bloque = 0
