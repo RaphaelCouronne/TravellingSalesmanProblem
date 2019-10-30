@@ -8,7 +8,7 @@ Galati    = [0, 346, 414, 194, 89, 23.3, 0, 21.5]
 Braila    = [0, 330, 392, 177, 110, 44.6, 21.7, 0]
 
 
-villes_mer_noire = ["prague", "varna", "burgas", "constanza", "izmail", "reni", "galata", "braila"]
+villes_mer_noire  = ["prague", "varna", "burgas", "constanza", "izmail", "reni", "galata", "braila"]
 tableau_mer_noire = [Prague, Varna, Burgas, Constanza, Izmail, Reni, Galati, Braila]
 
 matrice_mer_noire = {}

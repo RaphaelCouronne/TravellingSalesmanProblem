@@ -46,5 +46,15 @@ class HybridationTests(unittest.TestCase):
         self.assertEqual([0, 101, 100, 0], x2s)
 
 
+    def test_g5(self):
+        g5 = [City(x1, x2, n) \
+              for x1, x2, n in
+              [[0, 0, "O"], [10,0, "A"], [10,10, "B"], [0,10, "C"] , [5, 20, "D"]]]
+        print(g5)
+        c5 = Dynamique_Population(g5, nb_gens=4, taille_pop=10, distfn=euclide)
+        print(" -> ".join(c.nom for c in c5) + " -> ... ")
+
+
+
 if __name__ == '__main__':
     unittest.main()

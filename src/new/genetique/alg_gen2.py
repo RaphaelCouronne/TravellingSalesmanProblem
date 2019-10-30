@@ -69,7 +69,10 @@ def adaptation_individu(individu, distfn):
     retourne un nombre flottant
      """
     n = len(individu)
-    adapt = sum(distfn(individu[k], individu[k + 1]) for k in range(n - 1))
+    adapt = 0
+    for k in range(n - 1):
+        d = distfn(individu[k], individu[k + 1])
+        adapt += d
     adapt += distfn(individu[-1], individu[0])  # pour boucler le cycle
     return adapt
 
@@ -338,8 +341,8 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
     :return: le meilleur chemin trouve
     """
     ## Choixi du type de population initiale
-    # Population = Generation_Pop_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ totalement aléatoire
-    Population = Generation_Pop_Semi_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ semi-aléatoire
+    Population = Generation_Pop_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ totalement aléatoire
+    #Population = Generation_Pop_Semi_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ semi-aléatoire
     ##
 
     chemin, adaptation = Meilleur_Individu(Population, distfn)

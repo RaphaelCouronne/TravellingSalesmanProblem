@@ -22,7 +22,7 @@ def euclide(c1, c2):
 def manhattan(c1, c2):
     x11, x12, _ = c1
     x21, x22, _ = c2
-    return abs(x11-x21) + abs(x21-x22)
+    return abs(x11-x21) + abs(x12-x22)
 
 def haversine2(a):
     # square of sinus of half angle
