@@ -40,7 +40,7 @@ def tsp1(Sommets, distfn=euclide):
     return Chemin_Mini, Poids_Trajectoire_Mini
 
 
-g9 = [City(1, x2, "city_%d" % c) \
+g9 = [City(x1, x2, "city_%d" % c) \
       for c, (x1, x2) in enumerate([[0, 0], [100, 100], [0, 100], [100, 0], [50, 50], [75, 15], [75, 35], [20, 40], [50, 20]])]
 
 
