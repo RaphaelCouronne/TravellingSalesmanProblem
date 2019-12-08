@@ -11,11 +11,15 @@ from collections import namedtuple
 #  -- deux coordonnees x1, et x2 peut etre
 City = namedtuple("City", ["x1", "x2", "nom"])
 
+def city_to_string(city):
+    x1, x2, cn = city
+    return "{0}[{1}, {2}])".format(x1, x2, cn)
+
 def genere_liste_sommets(liste_x1x2s):
     return [City(x1, x2, "c%d" % c) for c,(x1, x2) in enumerate(liste_x1x2s)]
 
 def euclide(c1, c2):
-    x11, x12,_ = c1
+    x11, x12, _ = c1
     x21, x22, _ = c2
     return math.sqrt( (x21 -x11)**2 + (x12-x22)**2)
 
