@@ -282,8 +282,8 @@ def calcule_generation_suivante(Population, distfn, nb_bloque, proba_dynamiques=
         proba_mutation = 0.10
         proba_echange = 0.03
 
-    print("proba de prendre le gagnant={0}, proba d'hybridation={1}, proba de mutation={2}, proba d'echange={3}"
-          .format(proba_gagnant, proba_hybridation, proba_mutation, proba_echange))
+    #print("proba de prendre le gagnant={0}, proba d'hybridation={1}, proba de mutation={2}, proba d'echange={3}"
+        #.format(proba_gagnant, proba_hybridation, proba_mutation, proba_echange))
 
     # extraction population temporaire: attention il peut y avoir des doublons...
     # population temp= les gagnants
@@ -342,7 +342,7 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
                          distfn=euclide,
                          nb_bloque_max=30,
                          proba_dynamiques=True,
-                         gen_animation_fn=print_score):
+                         gen_animation_fn=no_animation, verbose = False):
     """ Lance l'algorithme sur nb_gens generations
 
     :param Liste_Sommets: une liste de villes (City)
@@ -364,7 +364,8 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
     nb_bloque = 0
     nb_blocage = 0
     for k in range(1, nb_gens + 1):
-        print("-- iteration {0}, blocage={1}".format(k, nb_blocage))
+        if verbose:
+            print("-- iteration {0}, blocage={1}".format(k, nb_blocage))
         Population = calcule_generation_suivante(Population, distfn, nb_blocage,
                                                  proba_dynamiques=proba_dynamiques)
 
@@ -372,10 +373,12 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
         chemin, adaptation = Meilleur_Individu(Population, distfn)
         gen_animation_fn(k, Population, chemin, adaptation)
         if adaptation >= prec_adaptation - 1e-6:
-            print("*** stationnaire a l iteration {0}, nb bloques = {1}".format(k, nb_bloque))
+            if verbose:
+                print("*** stationnaire a l iteration {0}, nb bloques = {1}".format(k, nb_bloque))
             nb_bloque += 1
             if nb_bloque >= nb_bloque_max:
-                print(">>>>>>>>>>>>>>>>>>>>> on change de probas")
+                if verbose:
+                    print(">>>>>>>>>>>>>>>>>>>>> on change de probas")
                 nb_blocage += 1
                 nb_bloque = 0
         else:
@@ -385,3 +388,4 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
     chemin, adaptation = Meilleur_Individu(Population, distfn)
 
     return chemin
+#    return Meilleur_Individu(Population, distfn)
