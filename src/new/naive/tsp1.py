@@ -3,7 +3,7 @@ from common.distances import euclide, distance_chemin, City, manhattan
 
 def Liste_Permutees(n):
     """ retourne les permutations"""
-    verbose = True
+    verbose = False
     if verbose:
         print("--> entre dans permut n={0}".format(n))
     if n == 2:
@@ -40,7 +40,7 @@ def tsp1(Sommets, distfn=euclide):
     return Chemin_Mini, Poids_Trajectoire_Mini
 
 
-g9 = [City(1, x2, "city_%d" % c) \
+g9 = [City(x1, x2, "city_%d" % c) \
       for c, (x1, x2) in enumerate([[0, 0], [100, 100], [0, 100], [100, 0], [50, 50], [75, 15], [75, 35], [20, 40], [50, 20]])]
 
 
