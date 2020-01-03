@@ -257,7 +257,7 @@ def Meilleur_Individu(Population, distfn):
 
 ### Construction de la génération suivante ###
 
-def calcule_generation_suivante(Population, distfn, nb_bloque, proba_dynamiques=True):
+def calcule_generation_suivante(Population, distfn, nb_bloque, proba_dynamiques=True, verbose=False):
     """ calculela population à la génération suivante """
     q = len(Population)
     Population_Temp = []
@@ -320,8 +320,8 @@ def calcule_generation_suivante(Population, distfn, nb_bloque, proba_dynamiques=
             nombre_echanges += 1
             #print('-- echange #{}'.format(nombre_mutations))
             Population_Temp[i] = echange2_alea(Individu_at_i)
-
-    print("-- #hybridations={0}, mutations={1}, #echanges={2}".format(nombre_hybridations, nombre_mutations, nombre_echanges))
+    if verbose:
+        print("-- #hybridations={0}, mutations={1}, #echanges={2}".format(nombre_hybridations, nombre_mutations, nombre_echanges))
 
     ## choix des meilleurs individus de Population (génération g)
     # (on en prend p//2)
@@ -387,5 +387,5 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
 
     chemin, adaptation = Meilleur_Individu(Population, distfn)
 
-    return chemin
-#    return Meilleur_Individu(Population, distfn)
+#    return chemin
+    return Meilleur_Individu(Population, distfn)
