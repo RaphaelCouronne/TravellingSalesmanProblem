@@ -33,6 +33,15 @@ def haversine2(a):
     sin_half = math.sin(a / 2)
     return sin_half * sin_half
 
+def distance_par_nom(dn):
+    if 'GEO' in dn:
+        return earth_distance
+    elif 'EUC_2D' in dn:
+        return euclide
+    else:
+        print("--on choisit distance euclidiennepar defaut...")
+        return euclide
+
 DEG2RAD = math.pi / 180.
 
 def earth_distance(c1, c2, rayon=6373):
