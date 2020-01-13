@@ -23,8 +23,8 @@ g35 = [
 
 l35 = genere_liste_sommets(g35)
 
-chemin= Dynamique_Population(l35, nb_gens=100, taille_pop=40, nb_bloque_max=10, gen_animation_fn=print_score)
+chemin35, d35 = Dynamique_Population(l35, nb_gens=100, taille_pop=40, nb_bloque_max=10, gen_animation_fn=print_score)
 
 from visu.plot import *
 
-plot_chemin(l35, chemin, largeur= 300, hauteur=200)
+plot_chemin(l35, chemin35, largeur= 300, hauteur=200)
