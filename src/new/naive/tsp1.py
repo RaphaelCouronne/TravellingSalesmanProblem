@@ -3,7 +3,7 @@ from common.distances import euclide, distance_chemin, City, manhattan
 
 def Liste_Permutees(n):
     """ retourne les permutations"""
-    verbose = True
+    verbose = False
     if verbose:
         print("--> entre dans permut n={0}".format(n))
     if n == 2:

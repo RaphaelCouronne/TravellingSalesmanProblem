@@ -257,7 +257,7 @@ def Meilleur_Individu(Population, distfn):
 
 ### Construction de la génération suivante ###
 
-def calcule_generation_suivante(Population, distfn):
+def calcule_generation_suivante(Population, distfn, nb_bloque, proba_dynamiques=True, verbose=False):
     """ calculela population à la génération suivante """
     q = len(Population)
     Population_Temp = []
@@ -267,10 +267,23 @@ def calcule_generation_suivante(Population, distfn):
     nombre_echanges = 0
     nombre_hybridations = 0
 
-    proba_gagnant = 0.85  # la probabilite de choisir le gagnat dans les tournois
-    proba_hybridation = 0.20  # la probabilite de faire une hybdridation
-    proba_mutation = 0.10
-    proba_echange = 0.03
+    def proba_dynamique(p_initiale, p_limite, n):
+        return p_limite + (p_initiale - p_limite)/(n+1)
+
+
+    proba_gagnant = proba_dynamique(0.90, 0.80, nb_bloque)  # la probabilite de choisir le gagnat dans les tournois
+    proba_hybridation = proba_dynamique(0.20, 0.40, nb_bloque)  # la probabilite de faire une hybdridation
+    proba_mutation = proba_dynamique(0.10, 0.33, nb_bloque)
+    proba_echange = proba_dynamique(0.05, 0.10, nb_bloque)
+
+    if not proba_dynamiques:
+        proba_gagnant = 0.85
+        proba_hybridation = 0.20
+        proba_mutation = 0.10
+        proba_echange = 0.03
+
+    #print("proba de prendre le gagnant={0}, proba d'hybridation={1}, proba de mutation={2}, proba d'echange={3}"
+        #.format(proba_gagnant, proba_hybridation, proba_mutation, proba_echange))
 
     # extraction population temporaire: attention il peut y avoir des doublons...
     # population temp= les gagnants
@@ -307,8 +320,8 @@ def calcule_generation_suivante(Population, distfn):
             nombre_echanges += 1
             #print('-- echange #{}'.format(nombre_mutations))
             Population_Temp[i] = echange2_alea(Individu_at_i)
-
-    print("-- #hybridations={0}, mutations={1}, #echanges={2}".format(nombre_hybridations, nombre_mutations, nombre_echanges))
+    if verbose:
+        print("-- #hybridations={0}, mutations={1}, #echanges={2}".format(nombre_hybridations, nombre_mutations, nombre_echanges))
 
     ## choix des meilleurs individus de Population (génération g)
     # (on en prend p//2)
@@ -328,7 +341,8 @@ def print_score(k, pop, chemin, adaptation):
 def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
                          distfn=euclide,
                          nb_bloque_max=30,
-                         gen_animation_fn=print_score):
+                         proba_dynamiques=True,
+                         gen_animation_fn=no_animation, verbose = False):
     """ Lance l'algorithme sur nb_gens generations
 
     :param Liste_Sommets: une liste de villes (City)
@@ -341,28 +355,37 @@ def Dynamique_Population(Liste_Sommets, nb_gens, taille_pop=30,
     :return: le meilleur chemin trouve
     """
     ## Choixi du type de population initiale
-    Population = Generation_Pop_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ totalement aléatoire
-    #Population = Generation_Pop_Semi_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ semi-aléatoire
+    #Population = Generation_Pop_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ totalement aléatoire
+    Population = Generation_Pop_Semi_Alea(Liste_Sommets, taille_pop, distfn)  # population de départ semi-aléatoire
     ##
 
     chemin, adaptation = Meilleur_Individu(Population, distfn)
     gen_animation_fn(0, Population, chemin, adaptation)
-    bloque = 0
+    nb_bloque = 0
+    nb_blocage = 0
     for k in range(1, nb_gens + 1):
-        print("-- iteration {0}".format(k))
-        Population = calcule_generation_suivante(Population, distfn)
+        if verbose:
+            print("-- iteration {0}, blocage={1}".format(k, nb_blocage))
+        Population = calcule_generation_suivante(Population, distfn, nb_blocage,
+                                                 proba_dynamiques=proba_dynamiques)
 
         prec_adaptation = adaptation
         chemin, adaptation = Meilleur_Individu(Population, distfn)
         gen_animation_fn(k, Population, chemin, adaptation)
         if adaptation >= prec_adaptation - 1e-6:
-            print("*** stationnaire a l iteration {0}, nb bloques = {1}".format(k, bloque))
-            bloque += 1
-            if bloque >= nb_bloque_max:
-                break
+            if verbose:
+                print("*** stationnaire a l iteration {0}, nb bloques = {1}".format(k, nb_bloque))
+            nb_bloque += 1
+            if nb_bloque >= nb_bloque_max:
+                if verbose:
+                    print(">>>>>>>>>>>>>>>>>>>>> on change de probas")
+                nb_blocage += 1
+                nb_bloque = 0
         else:
-            bloque = 0
+            nb_bloque = 0
+
 
     chemin, adaptation = Meilleur_Individu(Population, distfn)
 
-    return chemin
+#    return chemin
+    return Meilleur_Individu(Population, distfn)
