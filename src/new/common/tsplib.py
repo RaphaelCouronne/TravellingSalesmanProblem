@@ -11,7 +11,7 @@ def read_tsp_file(basename):
     return read_tsplib_path(tsp_path)
 
 def read_tsplib_path(tsp_path):
-    ignorer = {"COMMENT", "NODE_COORD_SECTION", "EOF", "NAME", "TYPE", "DIMENSION"}
+    ignorer = {"COMMENT", "NODE_COORD_SECTION", "EOF", "NAME", "TYPE", "DIMENSION", "DISPLAY_DATA_TYPE"}
     nom_distance = "EUC_2D"
     with open(tsp_path, "r") as tspf:
         lines = tspf.readlines()
