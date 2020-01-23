@@ -43,9 +43,9 @@ def comp_tsplib(basename, verbose=False):
     print('distance gen={0}, distance vraie={1}, ecart tsplib={2}%'.format(distgen, distvraie, diff))
     return diff
 
-X = [52, 105, 136]
+X = [22, 52, 105, 136]
 #problème avec att48 -> erreur de 260 ! et avec ulysse -> conversion longitude/latitude problème
-Y = [ comp_tsplib(basename) for basename in ['berlin52', 'lin105', 'pr136']]
+Y = [ comp_tsplib(basename) for basename in ['ulysses22','berlin52', 'lin105', 'pr136']]
 plt.plot(X, Y)
 plt.show()
 
