@@ -56,10 +56,11 @@ class HybridationTests(unittest.TestCase):
 
     def test_unlysse16(self):
         from common.tsplib import read_tsplib_path
-        u16, udist = read_tsplib_path("../tsplib/ulysses22.tsp")
-        self.assertEqual(22,len(u16))
-        uch, ud = Dynamique_Population(u16, nb_gens=4, taille_pop=10, distfn=udist)
+        u16, udist = read_tsplib_path("../tsplib/ulysses16.tsp")
+        self.assertEqual(16,len(u16))
+        uch, ud = Dynamique_Population(u16, nb_gens=4, taille_pop=20, distfn=udist)
         print(" -> ".join(c.nom for c in uch) + " -> ... ")
+        self.assertTrue(ud <= 8000)
 
 
 
