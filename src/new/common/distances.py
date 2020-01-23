@@ -52,13 +52,13 @@ def earth_distance(c1, c2, rayon=6373):
     :param rayon: le rayon de la terre en km (changer par miles si besoin
     :return:
     """
-    lon1, lat1, _ = c1
-    lon2, lat2, _ = c2
+    lat1, lon1, _ = c1
+    lat2, lon2, _ = c2
     # tconversion degres radians
     rlon1, rlat1 = DEG2RAD * lon1, DEG2RAD* lat1
     rlon2, rlat2 = DEG2RAD * lon2, DEG2RAD* lat2
-    assert 0 <= lat1 < 1.6  # less than pi/2
-    assert 0 <= lat2 < 1.6
+    assert 0 <= rlat1 < 1.6  # less than pi/2
+    assert 0 <= rlat2 < 1.6
 
     dlon = rlon2 - rlon1
     dlat = rlat2 - rlat1

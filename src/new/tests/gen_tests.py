@@ -54,6 +54,13 @@ class HybridationTests(unittest.TestCase):
         c5 = Dynamique_Population(g5, nb_gens=4, taille_pop=10, distfn=euclide)
         print(" -> ".join(c.nom for c in c5) + " -> ... ")
 
+    def test_unlysse16(self):
+        from common.tsplib import read_tsplib_path
+        u16, udist = read_tsplib_path("../tsplib/ulysses22.tsp")
+        self.assertEqual(22,len(u16))
+        uch, ud = Dynamique_Population(u16, nb_gens=4, taille_pop=10, distfn=udist)
+        print(" -> ".join(c.nom for c in uch) + " -> ... ")
+
 
 
 if __name__ == '__main__':
