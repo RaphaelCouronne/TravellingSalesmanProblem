@@ -39,7 +39,7 @@ def distance_par_nom(dn):
     elif 'EUC_2D' in dn:
         return euclide
     else:
-        print("--on choisit distance euclidiennepar defaut...")
+        print("--on choisit distance euclidienne par defaut...")
         return euclide
 
 DEG2RAD = math.pi / 180.
@@ -91,7 +91,7 @@ def distance2matrix(villes, distfn):
 
 
 def matrice_vers_fonction(distm, default_dist=1e+20):
-    """ Convertit une matrice de distance enune fonction.
+    """ Convertit une matrice de distance en une fonction.
 
     :param distm: la matrice de distance
     :param default_dist: la distance retournee quand le couple ne figure pas dansla matrice,

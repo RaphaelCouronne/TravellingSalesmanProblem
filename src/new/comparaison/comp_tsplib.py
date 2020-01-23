@@ -1,4 +1,6 @@
 import os
+import matplotlib.pyplot as plt
+
 
 from os.path import dirname as dn
 from common.distances import City, euclide, earth_distance
@@ -32,16 +34,20 @@ def print_resultats(chemin, distance):
 
 tsplib_resultats = { 'att48' : 10628, 'berlin52' : 7542, 'lin105' : 14379, 'pr136' : 96772, 'ulysses22' : 7013}
 
-def comp_tsplib(basename, verbose=True):
+def comp_tsplib(basename, verbose=False):
     g, d = read_tsp_file(basename) #liste des villes
     chemingen, distgen = Dynamique_Population(g, nb_gens=30, taille_pop=50, distfn=d, verbose=verbose)
     print(print_resultats(chemingen, distgen))
     distvraie = tsplib_resultats.get(basename)
     diff = (abs(distgen - distvraie) / distvraie)*100
-    print(' ecart tsplib={0:.2f}%'.format(diff))
+    print('distance gen={0}, distance vraie={1}, ecart tsplib={2}%'.format(distgen, distvraie, diff))
     return diff
 
-comp_tsplib('berlin52')
+X = [52, 105, 136]
+#problème avec att48 -> erreur de 260 ! et avec ulysse -> conversion longitude/latitude problème
+Y = [ comp_tsplib(basename) for basename in ['berlin52', 'lin105', 'pr136']]
+plt.plot(X, Y)
+plt.show()
 
 
 
